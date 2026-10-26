@@ -1,0 +1,36 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Install Godot
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          wget -q https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip
+          unzip Godot_v4.3-stable_linux.x86_64.zip
+          chmod +x Godot_v4.3-stable_linux.x86_64
+          sudo mv Godot_v4.3-stable_linux.x86_64 /usr/local/bin/godot
+
+      - name: Check project
+        run: |
+          godot --headless --editor --path . --quit
+
+      - name: Package project
+        run: |
+          mkdir -p output
+          zip -r output/Mohammed-Life-Simulator-project.zip project.godot README.md
+
+      - name: Upload project artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Mohammed-Life-Simulator
+          path: output/
